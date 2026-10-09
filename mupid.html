@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tugas 1</title>
+</head>
+<body>
+    <h1>Luas & Keliling Persegi Panjang</h1>
+    <h2>Panjang: <span id="panjang"></span></h2>
+    <br>
+    <h2>Lebar: <span id="lebar"></span></h2>
+    <br>
+    <h2>Luas: <span id="luas"></span> m<sup>2</sup></h2>
+    <br>
+    <h2>Keliling: <span id="keliling"></span> m<sup>2</sup></h2>
+
+    <script>
+        /*
+            ==Task 1==
+            Buat variable panjang dan lebar dengan tipe data number
+        */
+        let panjang = 20;
+        let lebar = 10;
+
+
+        
+        /*
+            ==Task 2==
+            Buat variable luas yang berisi hasil perkalian panjang dan lebar
+        */
+        // tulis disini
+        let luas = panjang * lebar;
+
+        
+
+        /*
+            ==Task 3==
+            Buat variable keliling yang berisi hasil 2 * (panjang + lebar)
+        */
+       // tulis disini
+                let keliling = 2 * (panjang + lebar);
+
+
+        // abaikan kode ini
+        document.getElementById("panjang").innerHTML = panjang;
+        document.getElementById("lebar").innerHTML = lebar;
+        document.getElementById("luas").innerHTML = luas;
+        document.getElementById("keliling").innerHTML = keliling;
+    </script>
+</body>
+</html>

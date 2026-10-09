@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Persegi Panjang</title>
+    <meta name="description" content="Kalkulator luas dan keliling persegi panjang interaktif dengan tampilan modern.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary: #7c3aed;
+            --primary-light: #a78bfa;
+            --secondary: #06b6d4;
+            --accent: #f472b6;
+            --bg-dark: #0a0a1a;
+            --bg-card: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --success: #10b981;
+            --glow-purple: rgba(124, 58, 237, 0.4);
+            --glow-cyan: rgba(6, 182, 212, 0.3);
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-dark);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background blobs */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -30%;
+            left: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--glow-purple), transparent 70%);
+            border-radius: 50%;
+            animation: blobMove1 12s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -30%;
+            right: -20%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--glow-cyan), transparent 70%);
+            border-radius: 50%;
+            animation: blobMove2 10s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes blobMove1 {
+            from { transform: translate(0, 0) scale(1); }
+            to   { transform: translate(80px, 60px) scale(1.15); }
+        }
+
+        @keyframes blobMove2 {
+            from { transform: translate(0, 0) scale(1); }
+            to   { transform: translate(-70px, -50px) scale(1.1); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 520px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .header .badge {
+            display: inline-block;
+            padding: 0.35rem 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: white;
+            margin-bottom: 1rem;
+            box-shadow: 0 0 20px var(--glow-purple);
+        }
+
+        .header h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #f1f5f9 30%, var(--primary-light) 70%, var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.75rem;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        /* Card */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.05),
+                0 20px 60px rgba(0,0,0,0.5),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+            animation: fadeInUp 0.6s ease both;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Shape visualizer */
+        .shape-preview {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            min-height: 170px;
+        }
+
+        .rect-visual {
+            position: relative;
+            border: 2.5px solid transparent;
+            background: linear-gradient(var(--bg-dark), var(--bg-dark)) padding-box,
+                        linear-gradient(135deg, var(--primary-light), var(--secondary)) border-box;
+            background-color: rgba(124,58,237,0.07);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: width 0.4s cubic-bezier(.34,1.56,.64,1), height 0.4s cubic-bezier(.34,1.56,.64,1);
+            width: 120px;
+            height: 80px;
+        }
+
+        .rect-label-center {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-align: center;
+            line-height: 1.6;
+            pointer-events: none;
+        }
+
+        /* Input group */
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.6rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.1rem;
+            pointer-events: none;
+        }
+
+        .input-field {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            padding: 0.85rem 3.5rem 0.85rem 2.8rem;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 500;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+            -moz-appearance: textfield;
+        }
+
+        .input-field::-webkit-inner-spin-button,
+        .input-field::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+        }
+
+        .input-field::placeholder {
+            color: rgba(148, 163, 184, 0.4);
+        }
+
+        .input-field:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.15), 0 0 20px rgba(124, 58, 237, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .input-unit {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-light);
+            background: rgba(124, 58, 237, 0.15);
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            margin: 2rem 0;
+        }
+
+        /* Results */
+        .results-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 1.2rem;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.2rem 1.1rem;
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .result-card.luas::before {
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+        }
+
+        .result-card.keliling::before {
+            background: linear-gradient(90deg, var(--secondary), #67e8f9);
+        }
+
+        .result-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+        }
+
+        .result-card.luas:hover {
+            border-color: rgba(124, 58, 237, 0.4);
+        }
+
+        .result-card.keliling:hover {
+            border-color: rgba(6, 182, 212, 0.4);
+        }
+
+        .result-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-card.luas .result-label { color: var(--primary-light); }
+        .result-card.keliling .result-label { color: var(--secondary); }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1;
+            transition: all 0.3s ease;
+        }
+
+        .result-unit {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-top: 0.3rem;
+        }
+
+        /* Info row */
+        .info-row {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .info-chip {
+            flex: 1;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .info-chip-icon {
+            font-size: 1.1rem;
+        }
+
+        .info-chip-content {
+            flex: 1;
+        }
+
+        .info-chip-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .info-chip-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Animate value pop */
+        @keyframes valuePop {
+            0%   { transform: scale(1); }
+            50%  { transform: scale(1.12); color: var(--primary-light); }
+            100% { transform: scale(1); }
+        }
+
+        .value-pop {
+            animation: valuePop 0.35s ease;
+        }
+
+        /* Footer note */
+        .footer-note {
+            text-align: center;
+            margin-top: 1.8rem;
+            font-size: 0.8rem;
+            color: rgba(148, 163, 184, 0.5);
+        }
+
+        .footer-note span {
+            color: var(--primary-light);
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .card { padding: 1.8rem 1.4rem; }
+            .header h1 { font-size: 1.9rem; }
+            .results-grid { grid-template-columns: 1fr; }
+            .result-value { font-size: 1.7rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <div class="badge">&#128208; Geometri Interaktif</div>
+            <h1>Persegi Panjang</h1>
+            <p>Hitung luas &amp; keliling secara real-time</p>
+        </div>
+
+        <div class="card">
+
+            <!-- Shape preview -->
+            <div class="shape-preview">
+                <div class="rect-visual" id="rectVisual">
+                    <div class="rect-label-center" id="rectLabel">Masukkan<br>nilai</div>
+                </div>
+            </div>
+
+            <!-- Input Panjang -->
+            <div class="input-group">
+                <label class="input-label" for="inputPanjang">&#8596; Panjang</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">&#128207;</span>
+                    <input
+                        type="number"
+                        id="inputPanjang"
+                        class="input-field"
+                        placeholder="Masukkan panjang..."
+                        min="0"
+                        step="any"
+                    >
+                    <span class="input-unit">m</span>
+                </div>
+            </div>
+
+            <!-- Input Lebar -->
+            <div class="input-group">
+                <label class="input-label" for="inputLebar">&#8597; Lebar</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">&#128208;</span>
+                    <input
+                        type="number"
+                        id="inputLebar"
+                        class="input-field"
+                        placeholder="Masukkan lebar..."
+                        min="0"
+                        step="any"
+                    >
+                    <span class="input-unit">m</span>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Results title -->
+            <div class="results-title">&#10024; Hasil Perhitungan</div>
+
+            <!-- Panjang & Lebar display -->
+            <div class="info-row" style="margin-bottom: 1rem;">
+                <div class="info-chip">
+                    <span class="info-chip-icon">&#8596;&#65039;</span>
+                    <div class="info-chip-content">
+                        <div class="info-chip-label">Panjang</div>
+                        <div class="info-chip-value"><span id="panjang">&#8212;</span> m</div>
+                    </div>
+                </div>
+                <div class="info-chip">
+                    <span class="info-chip-icon">&#8597;&#65039;</span>
+                    <div class="info-chip-content">
+                        <div class="info-chip-label">Lebar</div>
+                        <div class="info-chip-value"><span id="lebar">&#8212;</span> m</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Luas & Keliling -->
+            <div class="results-grid">
+                <div class="result-card luas">
+                    <div class="result-label">Luas</div>
+                    <div class="result-value" id="luas">&#8212;</div>
+                    <div class="result-unit">meter&#178;</div>
+                </div>
+                <div class="result-card keliling">
+                    <div class="result-label">Keliling</div>
+                    <div class="result-value" id="keliling">&#8212;</div>
+                    <div class="result-unit">meter</div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer-note">
+            Dibuat dengan &#10084;&#65039; &middot; <span>Tugas JavaScript</span>
+        </div>
+    </div>
+
+    <script>
+        /*
+            ==Task 1==
+            Buat variable panjang dan lebar dengan tipe data number
+            (sekarang diambil dari input user secara real-time)
+        */
+        // tulis disini
+
+        /*
+            ==Task 2==
+            Buat variable luas yang berisi hasil perkalian panjang dan lebar
+        */
+        // tulis disini
+
+        /*
+            ==Task 3==
+            Buat variable keliling yang berisi hasil 2 * (panjang + lebar)
+        */
+        // tulis disini
+
+        function hitung() {
+            // Task 1 - ambil nilai panjang dan lebar dari inputan user
+            let panjang = parseFloat(document.getElementById("inputPanjang").value);
+            let lebar   = parseFloat(document.getElementById("inputLebar").value);
+
+            // Validasi input
+            if (isNaN(panjang) || isNaN(lebar) || panjang < 0 || lebar < 0) {
+                ["panjang","lebar","luas","keliling"].forEach(function(id) {
+                    document.getElementById(id).innerHTML = "&#8212;";
+                });
+                updateRect(0, 0);
+                return;
+            }
+
+            // Task 2 - hitung luas
+            let luas = panjang * lebar;
+
+            // Task 3 - hitung keliling
+            let keliling = 2 * (panjang + lebar);
+
+            // Tampilkan hasil dengan animasi
+            animateValue("panjang",  panjang.toLocaleString('id-ID'));
+            animateValue("lebar",    lebar.toLocaleString('id-ID'));
+            animateValue("luas",     luas.toLocaleString('id-ID'));
+            animateValue("keliling", keliling.toLocaleString('id-ID'));
+
+            updateRect(panjang, lebar);
+        }
+
+        function animateValue(id, newVal) {
+            var el = document.getElementById(id);
+            el.classList.remove("value-pop");
+            void el.offsetWidth; // reflow untuk reset animasi
+            el.innerHTML = newVal;
+            el.classList.add("value-pop");
+        }
+
+        function updateRect(p, l) {
+            var rect  = document.getElementById("rectVisual");
+            var label = document.getElementById("rectLabel");
+
+            if (p === 0 && l === 0) {
+                rect.style.width  = "120px";
+                rect.style.height = "80px";
+                label.innerHTML = "Masukkan<br>nilai";
+                return;
+            }
+
+            var maxW = 240, maxH = 160, minW = 80, minH = 50;
+            var ratio = p / l;
+            var w, h;
+
+            if (ratio >= 1) {
+                w = maxW;
+                h = Math.max(minH, Math.min(maxH, maxW / ratio));
+            } else {
+                h = maxH;
+                w = Math.max(minW, Math.min(maxW, maxH * ratio));
+            }
+
+            rect.style.width  = w + "px";
+            rect.style.height = h + "px";
+            label.innerHTML = "<strong>" + p + "</strong> &times; <strong>" + l + "</strong>";
+        }
+
+        // Real-time: hitung otomatis setiap kali input berubah
+        document.getElementById("inputPanjang").addEventListener("input", hitung);
+        document.getElementById("inputLebar").addEventListener("input", hitung);
+    </script>
+
+</body>
+</html>
